@@ -126,6 +126,71 @@ input[type="submit"],.agileinfo_chat a,.w3ls_footer_grid1_left p a,.w3l_sign_in_
 .w3l_sign_in_register ul li i,.w3l_sign_in_register ul li:first-child{
 	padding-right:1em;
 }
+.w3l_sign_in_register ul li.account-menu{
+	position:relative;
+	padding-right:0;
+}
+.account-menu .account-menu-toggle{
+	display:flex;
+	align-items:center;
+	gap:8px;
+	padding:0;
+	border:0;
+	background:transparent;
+	color:#212121;
+}
+.account-menu .account-menu-toggle:hover,
+.account-menu .account-menu-toggle:focus{
+	background:transparent;
+}
+.account-menu .account-menu-toggle img{
+	width:40px;
+	height:40px;
+	border:2px solid #FF8D1B;
+	border-radius:50%;
+	object-fit:cover;
+}
+.w3l_sign_in_register ul.account-menu-dropdown{
+	right:0;
+	left:auto;
+	min-width:180px;
+	margin-top:10px;
+	padding:6px 0;
+	border:1px solid #e5e5e5;
+	border-radius:4px;
+	box-shadow:0 6px 16px rgba(0,0,0,.15);
+}
+.w3l_sign_in_register ul.account-menu-dropdown li{
+	display:block;
+	width:100%;
+	padding:0;
+	text-align:left;
+}
+.w3l_sign_in_register ul.account-menu-dropdown li:first-child{
+	padding:0;
+}
+.w3l_sign_in_register ul.account-menu-dropdown li a,
+.w3l_sign_in_register ul.account-menu-dropdown li form button{
+	display:block;
+	width:100%;
+	padding:10px 16px;
+	border:0;
+	background:#fff;
+	color:#333;
+	font-size:14px;
+	font-weight:400;
+	text-align:left;
+	text-transform:none;
+}
+.w3l_sign_in_register ul.account-menu-dropdown li a:hover,
+.w3l_sign_in_register ul.account-menu-dropdown li form button:hover{
+	background:#f5f5f5;
+	color:#FF8D1B;
+}
+.w3l_sign_in_register ul.account-menu-dropdown li i{
+	width:20px;
+	padding-right:0;
+}
 /*-- //header --*/
 /*-- nav --*/
 .navbar-default {

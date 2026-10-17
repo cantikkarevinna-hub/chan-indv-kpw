@@ -3,6 +3,127 @@
 @push('style')
   <link rel="stylesheet" type="text/css" href="{{ asset('template/list-css/table-style.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ asset('template/list-css/basictable.css') }}" />
+  <style>
+    .movie-reviews-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .movie-review {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin: 0;
+      padding: 18px;
+      border: 1px solid #e7e7e7;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .movie-review-avatar {
+      flex: 0 0 66px;
+      width: 66px;
+      height: 66px;
+      object-fit: cover;
+    }
+
+    .movie-review-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .movie-review-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .movie-review-name {
+      margin: 0;
+      color: #252525;
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    .movie-review-rating {
+      color: #ff8d1b;
+      font-size: 15px;
+      letter-spacing: 2px;
+      white-space: nowrap;
+    }
+
+    .movie-review-text {
+      margin: 0;
+      color: #666;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .review-rating-picker {
+      margin: 0 0 14px;
+      padding: 0;
+      border: 0;
+    }
+
+    .review-rating-picker legend {
+      margin-bottom: 4px;
+      color: #333;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .review-rating-stars {
+      display: inline-flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
+
+    .review-rating-stars input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+
+    .review-rating-stars label {
+      margin: 0 2px;
+      color: #bdbdbd;
+      cursor: pointer;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .review-rating-stars input:checked ~ label,
+    .review-rating-stars label:hover,
+    .review-rating-stars label:hover ~ label {
+      color: #ff8d1b;
+    }
+
+    .review-rating-stars input:focus-visible + label {
+      outline: 2px solid #333;
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 480px) {
+      .movie-review {
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .movie-review-avatar {
+        flex-basis: 44px;
+        width: 44px;
+        height: 44px;
+      }
+    }
+  </style>
 @endpush
 
 @push('scripts')
@@ -53,13 +174,13 @@
                       <thead>
                         <tr>
                         <th>Cast</th>
-                        <th>Peran</th>
+                        <th>Role</th>
                         </tr>
                       </thead>
                       <tbody>
                         @foreach ($perans as $peran)
                         <tr>
-                          <td class="w3-list-info">{{ $peran->cast_id }}</td>
+                          <td class="w3-list-info">{{ $peran->cast?->name ?? 'Unknown cast member' }}</td>
                           <td class="w3-list-info">{{ $peran->actor }}</td>
                         </tr>
                         @endforeach
@@ -116,32 +237,67 @@
         <div class="clearfix"> </div>
         <div class="all-comments">
           <div class="all-comments-info">
-            <a href="#">Comments</a>
+            <a href="#reviews">Reviews</a>
             <div class="agile-info-wthree-box">
-              <form>
-                <input type="text" placeholder="Name" required="">			           					   
-                <input type="text" placeholder="Email" required="">
-                <input type="text" placeholder="Phone" required="">
-                <textarea placeholder="Message" required=""></textarea>
-                <input type="submit" value="SEND">
-                <div class="clearfix"> </div>
-              </form>
+              @if (session('status'))
+                <div class="alert alert-success" role="status">{{ session('status') }}</div>
+              @endif
+              @if ($errors->any())
+                <div class="alert alert-danger" role="alert">
+                  <ul>
+                    @foreach ($errors->all() as $error)
+                      <li>{{ $error }}</li>
+                    @endforeach
+                  </ul>
+                </div>
+              @endif
+              @auth
+                <form action="{{ route('movies.reviews.store', $film) }}" method="post">
+                  @csrf
+                  <fieldset class="review-rating-picker">
+                    <legend>Rating</legend>
+                    <div class="review-rating-stars">
+                      @for ($rating = 5; $rating >= 1; $rating--)
+                        <input id="rating-{{ $rating }}" type="radio" name="rating" value="{{ $rating }}" @checked(old('rating') == $rating) required>
+                        <label for="rating-{{ $rating }}" title="{{ $rating }} out of 5 stars" aria-label="{{ $rating }} out of 5 stars">&#9733;</label>
+                      @endfor
+                    </div>
+                  </fieldset>
+                  <textarea name="comment" placeholder="Write your review..." maxlength="2000" required>{{ old('comment') }}</textarea>
+                  @error('rating')<p class="text-danger">{{ $message }}</p>@enderror
+                  @error('comment')<p class="text-danger">{{ $message }}</p>@enderror
+                  <input type="submit" value="POST REVIEW">
+                  <div class="clearfix"></div>
+                </form>
+              @else
+                <p><a href="{{ route('login') }}">Sign in</a> to post a review.</p>
+              @endauth
             </div>
           </div>
-          <div class="media-grids">
-            @foreach ($comments as $comment)
-              <div class="media">
-                <h5>{{ $comment->user_id }}</h5>
-                <div class="media-left">
-                  <a href="#">
-                    <img src="{{ asset('storage/images/user.jpg') }}" title="One movies" alt=" " />
-                  </a>
+          <div class="movie-reviews-list" id="reviews">
+            @forelse ($comments as $comment)
+              <article class="movie-review">
+                <img class="movie-review-avatar" src="{{ asset('template/images/user.jpg') }}" alt="">
+                <div class="movie-review-content">
+                  <div class="movie-review-header">
+                    <h5 class="movie-review-name">{{ $comment->user?->name ?? 'Former user' }}</h5>
+                    <span class="movie-review-rating" role="img" aria-label="{{ $comment->rating ?? 0 }} out of 5 stars">
+                      @for ($star = 1; $star <= 5; $star++)
+                        <i class="fa {{ $star <= ($comment->rating ?? 0) ? 'fa-star' : 'fa-star-o' }}" aria-hidden="true"></i>
+                      @endfor
+                    </span>
+                  </div>
+                  <p class="movie-review-text">{{ $comment->comment }}</p>
                 </div>
-                <div class="media-body">
-                  <p>{{ $comment->comment }}</p>
-                </div>
+              </article>
+            @empty
+              <p>No reviews yet. Be the first to share your thoughts.</p>
+            @endforelse
+            @if ($comments->hasPages())
+              <div class="movie-reviews-pagination">
+                {{ $comments->fragment('reviews')->links() }}
               </div>
-            @endforeach
+            @endif
           </div>
         </div>
       </div>

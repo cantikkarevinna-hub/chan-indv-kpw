@@ -23,7 +23,7 @@ class FilmSeeder extends Seeder
         while (($data = fgetcsv($csvFile, 200, ";")) !== FALSE) {
             if (!$firstline) {
                 Film::create([
-                    "poster"    => $data['0'],
+                    "poster"    => str_replace("storage/images/", "template/images/", $data['0']),
                     "title"     => $data['1'],
                     "year"      => $data['2'],
                     "genre_id"  => $data['3'],

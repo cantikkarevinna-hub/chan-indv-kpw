@@ -14,9 +14,6 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <!-- header -->
 @include('templates.component.header')
 <!-- //header -->
-<!-- bootstrap-pop-up -->
-@include('templates.component.login')
-<!-- //bootstrap-pop-up -->
 <!-- nav -->
 @include('templates.component.navbar')
 <!-- //nav -->

@@ -2,12 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Profile;
 use App\Http\Requests\StoreProfileRequest;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Models\Profile;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    public function showMine(): View
+    {
+        $user = Auth::user()->load('profile');
+
+        return view('components.profile', compact('user'));
+    }
+
     /**
      * Display a listing of the resource.
      */

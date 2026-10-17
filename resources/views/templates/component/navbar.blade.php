@@ -20,15 +20,15 @@
                 <li>
                   <div class="col-sm-4">
                     <ul class="multi-column-dropdown">
-                      @for ($genre = 1; $genre <= $genres->count() - 1; $genre++)
-                        <li><a href="{{ route('genre', $genres[$genre]->id) }}">{{ $genres[$genre]->name }}</a></li>
-                        @if($genre % 7 == 0)
+                      @foreach ($genres as $genre)
+                        <li><a href="{{ route('genre', $genre->id) }}">{{ $genre->name }}</a></li>
+                        @if($loop->iteration % 7 == 0 && ! $loop->last)
                           </ul>
                         </div>
                         <div class="col-sm-4">
                           <ul class="multi-column-dropdown">
                         @endif
-                      @endfor
+                      @endforeach
                     </ul>
                   </div>
                   <div class="clearfix"></div>
