@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cast;
 use App\Models\Film;
 use App\Models\Genre;
 use App\Models\Kritik;
+use App\Models\Subscriber;
 use App\Models\User;
 use Illuminate\View\View;
 
@@ -18,6 +20,8 @@ class DashboardController extends Controller
             'genreCount' => Genre::count(),
             'userCount' => User::count(),
             'reviewCount' => Kritik::count(),
+            'castCount' => Cast::count(),
+            'subscriberCount' => Subscriber::count(),
         ]);
     }
 }

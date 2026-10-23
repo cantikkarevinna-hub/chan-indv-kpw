@@ -9,8 +9,11 @@
     <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><h3>{{ $genreCount }}</h3>Genres</div></div></div>
     <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><h3>{{ $userCount }}</h3>Users</div></div></div>
     <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><h3>{{ $reviewCount }}</h3>Reviews</div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><h3>{{ $castCount }}</h3>Cast members</div></div></div>
+    <div class="col-sm-4"><div class="panel panel-default"><div class="panel-body"><h3>{{ $subscriberCount }}</h3>Subscribers</div></div></div>
   </div>
 
   <a class="btn btn-primary" href="{{ route('admin.films.index') }}">Manage films</a>
-  <a class="btn btn-default" href="{{ route('admin.reviews.index') }}">Manage reviews</a>
+  <a class="btn btn-primary" href="{{ route('admin.casts.index') }}">Manage cast</a>
+  <a class="btn btn-primary" href="{{ route('admin.reviews.index') }}">Manage reviews</a>
 @endsection

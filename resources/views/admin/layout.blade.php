@@ -10,6 +10,7 @@
     body { padding: 24px 0; }
     .admin-nav { margin-bottom: 24px; padding: 12px 0; border-bottom: 1px solid #ddd; }
     .admin-actions { display: flex; gap: 8px; align-items: center; }
+    .admin-nav .admin-actions { gap: 16px; }
     .admin-actions form { margin: 0; }
     .poster-thumb { width: 60px; height: 85px; object-fit: cover; }
   </style>
@@ -19,12 +20,11 @@
     <div class="admin-nav clearfix">
       <a href="{{ route('admin.dashboard') }}"><strong>OneMovies Admin</strong></a>
       <div class="pull-right admin-actions">
-        <a href="{{ route('admin.films.index') }}">Films</a>
-        <a href="{{ route('admin.reviews.index') }}">Reviews</a>
         <a href="{{ route('home') }}">View website</a>
+        <a href="{{ route('admin.subscribers.index') }}">View subscribers</a>
         <form action="{{ route('logout') }}" method="post">
           @csrf
-          <button class="btn btn-link" type="submit">Logout</button>
+          <button class="btn btn-danger btn-sm" type="submit">Logout</button>
         </form>
       </div>
     </div>

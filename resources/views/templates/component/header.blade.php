@@ -19,6 +19,9 @@
               <i class="fa fa-caret-down" aria-hidden="true"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-right account-menu-dropdown">
+              @if (auth()->user()->role?->name === 'admin')
+                <li><a href="{{ route('admin.dashboard') }}"><i class="fa fa-dashboard" aria-hidden="true"></i> Admin Dashboard</a></li>
+              @endif
               <li><a href="{{ route('profile.me') }}"><i class="fa fa-user" aria-hidden="true"></i> My Profile</a></li>
               <li>
                 <form action="{{ route('logout') }}" method="post">

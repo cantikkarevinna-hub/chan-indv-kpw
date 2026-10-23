@@ -9,6 +9,7 @@ use App\Models\Kritik;
 use App\Models\Peran;
 use App\Models\Profile;
 use App\Models\Role;
+use App\Models\Subscriber;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -78,8 +79,41 @@ class AuthAndAdminTest extends TestCase
         $this->get(route('profile.me'))
             ->assertOk()
             ->assertSee('My Profile')
-            ->assertSee($user->name)
-            ->assertSee($user->email);
+            ->assertSee($user->email)
+            ->assertDontSee('Address')
+            ->assertSee('Edit profile')
+            ->assertSee('font-size: 17px');
+
+        $this->get(route('profile.edit'))
+            ->assertOk()
+            ->assertSee('Edit Profile')
+            ->assertSee('name="email"', false)
+            ->assertSee('name="umur"', false)
+            ->assertSee('name="bio"', false)
+            ->assertDontSee('name="name"', false)
+            ->assertDontSee('name="alamat"', false);
+
+        $this->put(route('profile.update'), [
+            'email' => 'updated@example.com',
+            'umur' => 35,
+            'bio' => 'An updated profile biography.',
+        ])->assertRedirect(route('profile.me'))
+            ->assertSessionHas('status', 'Profile updated successfully.');
+
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'email' => 'updated@example.com']);
+        $this->assertDatabaseHas('profiles', [
+            'id' => $user->profile_id,
+            'umur' => 35,
+            'bio' => 'An updated profile biography.',
+            'alamat' => '',
+        ]);
+
+        $admin = $this->createUser('admin');
+        $this->actingAs($admin)
+            ->get(route('movies'))
+            ->assertOk()
+            ->assertSee('Admin Dashboard')
+            ->assertSee(route('admin.dashboard'));
     }
 
     public function test_admin_can_create_update_and_delete_a_film(): void
@@ -261,6 +295,68 @@ class AuthAndAdminTest extends TestCase
 
         $this->assertDatabaseMissing('kritiks', ['id' => $oneStarReview->id]);
         $this->assertDatabaseHas('kritiks', ['id' => $fiveStarReview->id]);
+    }
+
+    public function test_visitors_can_subscribe_and_duplicate_emails_are_not_added(): void
+    {
+        $this->from(route('home'))
+            ->post(route('subscriptions.store'), ['email' => '  FILM.FAN@EXAMPLE.COM  '])
+            ->assertRedirect(route('home'))
+            ->assertSessionHas('subscription_status', 'Thank you for subscribing!');
+
+        $this->assertDatabaseHas('subscribers', ['email' => 'film.fan@example.com']);
+
+        $this->from(route('home'))
+            ->post(route('subscriptions.store'), ['email' => 'film.fan@example.com'])
+            ->assertRedirect(route('home'))
+            ->assertSessionHas('subscription_status', 'This email is already subscribed.');
+
+        $this->assertDatabaseCount('subscribers', 1);
+
+        $this->from(route('home'))
+            ->post(route('subscriptions.store'), ['email' => 'not-an-email'])
+            ->assertRedirect(route('home'))
+            ->assertSessionHasErrors('email');
+    }
+
+    public function test_admin_can_view_subscribers_and_manage_cast_members(): void
+    {
+        $admin = $this->createUser('admin');
+        $subscriber = Subscriber::create(['email' => 'viewer@example.com']);
+
+        $this->actingAs($admin)
+            ->get(route('admin.subscribers.index'))
+            ->assertOk()
+            ->assertSee($subscriber->email);
+
+        $this->get(route('admin.casts.index'))
+            ->assertOk()
+            ->assertSee('Manage Cast');
+
+        $this->post(route('admin.casts.store'), [
+            'name' => 'Jane Actor',
+            'age' => 30,
+            'bio' => 'Performer and storyteller.',
+        ])->assertRedirect(route('admin.casts.index'));
+
+        $cast = Cast::where('name', 'Jane Actor')->firstOrFail();
+        $this->assertDatabaseHas('casts', [
+            'id' => $cast->id,
+            'age' => 30,
+            'bio' => 'Performer and storyteller.',
+        ]);
+
+        $this->put(route('admin.casts.update', $cast), [
+            'name' => 'Jane Actor Updated',
+            'age' => 31,
+            'bio' => 'Updated biography.',
+        ])->assertRedirect(route('admin.casts.index'));
+
+        $this->assertDatabaseHas('casts', ['id' => $cast->id, 'name' => 'Jane Actor Updated']);
+
+        $this->delete(route('admin.casts.destroy', $cast))
+            ->assertRedirect(route('admin.casts.index'));
+        $this->assertDatabaseMissing('casts', ['id' => $cast->id]);
     }
 
     public function test_movie_catalog_filters_by_search_and_genre(): void

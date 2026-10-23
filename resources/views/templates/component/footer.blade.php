@@ -4,11 +4,18 @@
       <div class="col-md-6 w3ls_footer_grid_left">
         <div class="w3ls_footer_grid_left1">
           <h2>Subscribe to us</h2>
+          @if (session('subscription_status'))
+            <p role="status">{{ session('subscription_status') }}</p>
+          @endif
           <div class="w3ls_footer_grid_left1_pos">
-            <form action="#" method="post">
-              <input type="email" name="email" placeholder="Your email..." required="">
+            <form action="{{ route('subscriptions.store') }}" method="post">
+              @csrf
+              <input type="email" name="email" value="{{ old('email') }}" placeholder="Your email..." required="">
               <input type="submit" value="Send">
             </form>
+            @error('email')
+              <p role="alert">{{ $message }}</p>
+            @enderror
           </div>
         </div>
       </div>

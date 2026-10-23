@@ -38,7 +38,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <script src="{{ asset('template/js/bootstrap.min.js') }}"></script>
 <script>
 	$(document).ready(function(){
-		$(".dropdown").hover(            
+		$(".navbar-nav > .dropdown").hover(
 			function() {
 				$('.dropdown-menu', this).stop( true, true ).slideDown("fast");
 				$(this).toggleClass('open');        

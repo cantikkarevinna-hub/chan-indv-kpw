@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProfileRequest;
 use App\Http\Requests\UpdateProfileRequest;
-use App\Models\Profile;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -15,6 +16,38 @@ class ProfileController extends Controller
         $user = Auth::user()->load('profile');
 
         return view('components.profile', compact('user'));
+    }
+
+    public function editMine(): View
+    {
+        $user = Auth::user()->load('profile');
+
+        return view('components.profile-edit', compact('user'));
+    }
+
+    public function updateMine(UpdateProfileRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+        $validated = $request->validated();
+
+        DB::transaction(function () use ($user, $validated) {
+            if ($user->email !== $validated['email']) {
+                $user->email_verified_at = null;
+            }
+
+            $user->email = $validated['email'];
+            $user->save();
+
+            $user->profile()->updateOrCreate(
+                ['id' => $user->profile_id],
+                [
+                    'umur' => $validated['umur'],
+                    'bio' => $validated['bio'] ?? '',
+                ]
+            );
+        });
+
+        return redirect()->route('profile.me')->with('status', 'Profile updated successfully.');
     }
 
     /**
